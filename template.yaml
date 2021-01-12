@@ -9,10 +9,19 @@ Metadata:
           default: "Redshift Data API Lambda example"
         Parameters:
           - RedshiftSecretArn
+          - RedshiftClusterId
+          - RedshiftClusterDatabase
+          - SQLStatement
 
     ParameterLabels:
       RedshiftSecretArn:
         default: "Secret Mager ARN for RS cluster"
+      RedshiftClusterId:
+        default: "Id for the Redshift cluster to be used"
+      RedshiftClusterDatabase:
+        default: "Database name to be used in the provided redshift cluster"
+      SQLStatement:
+        default: "SQL statement to be executed by the RS data API"
 
 Parameters:
   RedshiftSecretArn:
@@ -20,6 +29,20 @@ Parameters:
     Description: 'Enter the ARN of the secret containing the user and password fot the RS cluster'
     MinLength: 20
     MaxLength: 2048
+  RedshiftClusterId:
+    Type: String
+    Description: 'Enter the id of your Redshift cluster'
+    MinLength: 1
+    MaxLength: 63
+    AllowedPattern: '([a-z]|[A-Z]|[0-9]|-)*'
+  RedshiftClusterDatabase:
+    Type: String
+    Description: 'Enter the database name to be used in your Redshift cluster'
+    MinLength: 1
+    MaxLength: 127
+  SQLStatement:
+    Type: String
+    Description: 'Enter the SQL statement to be executed'
 
 Resources:
   # See https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
@@ -40,3 +63,7 @@ Resources:
       Environment:
         Variables:
           RS_SECRET_ARN: !Ref RedshiftSecretArn
+          RS_CLUSTER_ID: !Ref RedshiftClusterId
+          RS_CLUSTER_REGION: !Ref "AWS::Region"
+          RS_CLUSTER_DATABASE: !Ref RedshiftClusterDatabase
+          SQL_STATEMENT: !Ref SQLStatement

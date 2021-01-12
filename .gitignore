@@ -2,3 +2,4 @@
 /target/
 /.aws-sam/
 /.idea/
+/*.tar.gz

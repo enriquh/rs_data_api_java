@@ -3,7 +3,6 @@ package com.example.myapp;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.redshiftdata.RedshiftDataClient;
 import software.amazon.awssdk.services.redshiftdata.model.*;
@@ -35,10 +34,13 @@ public class App implements RequestHandler<Object, Object> {
             client = App.getRedshiftDataClient();
 
             String secretArn = System.getenv("RS_SECRET_ARN");
+            String clusterId = System.getenv("RS_CLUSTER_ID");
+            String databaseName = System.getenv("RS_CLUSTER_DATABASE");
+            String sql = System.getenv("SQL_STATEMENT");
 
-            ExecuteStatementRequest executeStatementRequest= ExecuteStatementRequest.builder().clusterIdentifier("redshift-cluster-1").database("dev")
+            ExecuteStatementRequest executeStatementRequest= ExecuteStatementRequest.builder().clusterIdentifier(clusterId).database(databaseName)
                     .secretArn(secretArn)
-                    .sql("select * from nyc_yellow_taxi limit 10;").build();
+                    .sql(sql).build();
 
             ExecuteStatementResponse response = client.executeStatement(executeStatementRequest);
 
@@ -81,7 +83,7 @@ public class App implements RequestHandler<Object, Object> {
 
     public static RedshiftDataClient getRedshiftDataClient() {
         if (redshiftDataClient == null)
-            redshiftDataClient = RedshiftDataClient.builder().region(Region.US_EAST_1).credentialsProvider(DefaultCredentialsProvider.builder().profileName("MyAccount").build()).build();
+            redshiftDataClient = RedshiftDataClient.builder().region(Region.of(System.getenv("RS_CLUSTER_REGION"))).credentialsProvider(DefaultCredentialsProvider.builder().profileName("MyAccount").build()).build();
 
         return redshiftDataClient;
     }
